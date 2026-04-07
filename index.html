@@ -1,0 +1,1969 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRESCO 內部分享 — 平台、Vibe Coding 與實戰案例</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7c3aed;
+      --purple-light: #a78bfa;
+      --purple-dark: #5b21b6;
+      --purple-50: #f5f3ff;
+      --purple-100: #ede9fe;
+      --green: #10b981;
+      --green-dark: #059669;
+      --green-50: #ecfdf5;
+      --green-100: #d1fae5;
+      --orange: #f59e0b;
+      --orange-dark: #d97706;
+      --orange-50: #fffbeb;
+      --orange-100: #fef3c7;
+      --blue: #3b82f6;
+      --blue-50: #eff6ff;
+      --red: #ef4444;
+      --red-50: #fef2f2;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --sidebar-w: 260px;
+      --topbar-h: 0px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans TC', -apple-system, sans-serif;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--gray-900);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo h1 {
+      font-size: 1.3em;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .sidebar-logo p {
+      font-size: 0.72em;
+      color: var(--gray-400);
+      margin-top: 2px;
+    }
+    .sidebar-section {
+      padding: 16px 12px 4px;
+      font-size: 0.65em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gray-500);
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px 9px 20px;
+      color: var(--gray-300);
+      text-decoration: none;
+      font-size: 0.82em;
+      font-weight: 400;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .sidebar-link:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+    .sidebar-link.active {
+      color: #fff;
+      background: rgba(124,58,237,0.2);
+      border-left-color: var(--purple);
+      font-weight: 500;
+    }
+    .sidebar-link .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-purple { background: var(--purple-light); }
+    .dot-green { background: var(--green); }
+    .dot-orange { background: var(--orange); }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+    }
+    .page {
+      display: none;
+      padding: 36px 48px 60px;
+      max-width: 1100px;
+      animation: fadeIn 0.25s ease;
+    }
+    .page.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== TYPOGRAPHY ===== */
+    h2 {
+      font-size: 1.85em;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    h3 {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin: 24px 0 10px;
+      color: var(--gray-700);
+    }
+    h4 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .page-subtitle {
+      font-size: 1em;
+      color: var(--gray-500);
+      margin-bottom: 28px;
+    }
+    p { margin-bottom: 12px; font-size: 0.92em; }
+    ul, ol { margin-left: 1.3em; margin-bottom: 14px; }
+    li { margin-bottom: 5px; font-size: 0.9em; }
+    strong { font-weight: 600; }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--gray-100);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* ===== PAGE HEADER BANNER ===== */
+    .page-header {
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-bottom: 32px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::after {
+      content: '';
+      position: absolute;
+      right: -30px; top: -30px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .page-header h2 { color: #fff; margin-bottom: 4px; }
+    .page-header p { color: rgba(255,255,255,0.85); margin: 0; }
+    .header-purple { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); }
+    .header-green { background: linear-gradient(135deg, var(--green), var(--green-dark)); }
+    .header-orange { background: linear-gradient(135deg, var(--orange), var(--orange-dark)); }
+
+    /* ===== CARDS GRID ===== */
+    .cards {
+      display: grid;
+      gap: 16px;
+      margin: 16px 0 24px;
+    }
+    .cards-2 { grid-template-columns: 1fr 1fr; }
+    .cards-3 { grid-template-columns: repeat(3, 1fr); }
+    .cards-4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px 24px;
+      border: 1px solid var(--gray-200);
+      transition: box-shadow 0.15s;
+    }
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .card h4 { font-size: 0.9em; }
+    .card p { font-size: 0.82em; color: var(--gray-600); }
+    .card ul { font-size: 0.82em; color: var(--gray-600); }
+    .card-accent {
+      border-left: 4px solid;
+      border-top: none; border-right: none; border-bottom: none;
+    }
+    .accent-purple { border-left-color: var(--purple); }
+    .accent-green { border-left-color: var(--green); }
+    .accent-orange { border-left-color: var(--orange); }
+    .accent-blue { border-left-color: var(--blue); }
+    .accent-red { border-left-color: var(--red); }
+
+    /* ===== HIGHLIGHT BOX ===== */
+    .highlight {
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 16px 0;
+      font-size: 0.9em;
+    }
+    .highlight p { margin: 0; }
+    .hl-purple { background: var(--purple-50); border-left: 4px solid var(--purple); }
+    .hl-green { background: var(--green-50); border-left: 4px solid var(--green); }
+    .hl-orange { background: var(--orange-50); border-left: 4px solid var(--orange); }
+    .hl-blue { background: var(--blue-50); border-left: 4px solid var(--blue); }
+    .hl-red { background: var(--red-50); border-left: 4px solid var(--red); }
+
+    /* ===== FLOW DIAGRAM ===== */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      border: 2px solid var(--gray-300);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 0.8em;
+      font-weight: 500;
+      text-align: center;
+      min-width: 90px;
+      background: #fff;
+    }
+    .flow-box.filled { color: #fff; border: none; }
+    .flow-box.purple { background: var(--purple); }
+    .flow-box.green { background: var(--green); }
+    .flow-box.orange { background: var(--orange); }
+    .flow-box.blue { background: var(--blue); }
+    .flow-arrow { font-size: 1.4em; color: var(--gray-400); }
+    .flow-group { display: flex; gap: 6px; }
+
+    /* ===== TABLE ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 0.85em;
+    }
+    th {
+      background: var(--gray-800);
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 500;
+    }
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child { border-radius: 0 8px 0 0; }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    tr:nth-child(even) { background: var(--gray-50); }
+    tr:hover { background: var(--purple-50); }
+
+    /* ===== BADGE ===== */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75em;
+      font-weight: 500;
+      color: #fff;
+    }
+    .badge-purple { background: var(--purple); }
+    .badge-green { background: var(--green); }
+    .badge-orange { background: var(--orange); }
+    .badge-blue { background: var(--blue); }
+    .badge-red { background: var(--red); }
+    .badge-gray { background: var(--gray-400); }
+
+    /* ===== PROMPT BLOCK ===== */
+    .prompt {
+      background: var(--gray-900);
+      color: var(--gray-200);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78em;
+      margin: 10px 0 14px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .prompt .label { color: var(--green); font-weight: 700; }
+    .prompt .user { color: #fbbf24; }
+    .prompt .comment { color: var(--gray-500); }
+
+    /* ===== STATS ROW ===== */
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin: 18px 0 24px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 28px;
+      border: 1px solid var(--gray-200);
+      text-align: center;
+      flex: 1;
+    }
+    .stat-num {
+      font-size: 2.4em;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+    .stat-label {
+      font-size: 0.78em;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* ===== TWO COLUMNS ===== */
+    .cols {
+      display: grid;
+      gap: 28px;
+      margin: 16px 0;
+    }
+    .cols-2 { grid-template-columns: 1fr 1fr; }
+    .cols-wide { grid-template-columns: 3fr 2fr; }
+
+    /* ===== VS COMPARISON ===== */
+    .vs {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 16px;
+      align-items: start;
+      margin: 18px 0;
+    }
+    .vs-side {
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px;
+      border: 1px solid var(--gray-200);
+    }
+    .vs-center {
+      font-size: 1.8em;
+      font-weight: 900;
+      color: var(--gray-300);
+      text-align: center;
+      align-self: center;
+    }
+
+    /* ===== TIMELINE ===== */
+    .timeline {
+      position: relative;
+      margin: 14px 0 20px;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px; top: 4px; bottom: 4px;
+      width: 2px;
+      background: var(--purple-light);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 16px;
+      font-size: 0.85em;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -24px; top: 7px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--purple);
+    }
+    .tl-item .tl-label {
+      font-weight: 600;
+      color: var(--purple);
+    }
+
+    /* ===== CODE BLOCK ===== */
+    pre.codeblock {
+      background: var(--gray-900);
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 18px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78em;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 12px 0 18px;
+    }
+
+    /* ===== DIVIDER ===== */
+    hr {
+      border: none;
+      border-top: 1px solid var(--gray-200);
+      margin: 28px 0;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .sidebar { width: 220px; }
+      .main { margin-left: 220px; }
+      .page { padding: 24px 28px 48px; }
+      .cards-3, .cards-4 { grid-template-columns: 1fr 1fr; }
+      .cols-2, .cols-wide { grid-template-columns: 1fr; }
+      .vs { grid-template-columns: 1fr; }
+      .vs-center { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== PASSWORD GATE ===== -->
+<div id="password-gate" style="
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Noto Sans TC', sans-serif;
+">
+  <div style="text-align:center; color:#fff;">
+    <p style="font-size:3em; font-weight:900; opacity:0.3; margin-bottom:-8px;">PRESCO</p>
+    <h2 style="font-size:1.6em; font-weight:600; margin-bottom:24px;">內部技術分享</h2>
+    <form id="pw-form" style="display:flex; gap:10px; justify-content:center;">
+      <input id="pw-input" type="password" placeholder="請輸入密碼"
+        autocomplete="off"
+        style="
+          padding: 12px 20px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.1); color: #fff; font-size: 1em;
+          outline: none; width: 240px; font-family: inherit;
+        "
+      >
+      <button type="submit" style="
+        padding: 12px 28px; border-radius: 10px; border: none;
+        background: #fff; color: #5b21b6; font-weight: 600; font-size: 1em;
+        cursor: pointer; font-family: inherit;
+      ">進入</button>
+    </form>
+    <p id="pw-error" style="color:#fca5a5; margin-top:12px; font-size:0.85em; display:none;">密碼錯誤，請重試</p>
+  </div>
+</div>
+<script>
+(function(){
+  // SHA-256 hash of the password for basic obfuscation
+  const HASH = '18ed30e8d589583772d79f7f7ff51f0ef6f02da575a6fe2ceadda5615b1ca4bb';
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  // Check if already authenticated this session
+  if (sessionStorage.getItem('presco-auth') === 'ok') {
+    document.getElementById('password-gate').style.display = 'none';
+  }
+  document.getElementById('pw-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const val = document.getElementById('pw-input').value;
+    if (await sha256(val) === HASH) {
+      sessionStorage.setItem('presco-auth', 'ok');
+      document.getElementById('password-gate').style.display = 'none';
+    } else {
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  });
+  document.getElementById('pw-input').focus();
+})();
+</script>
+
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>PRESCO</h1>
+    <p>內部技術分享 ｜ 2026.04</p>
+  </div>
+
+  <div class="sidebar-section">Part 1 — 平台</div>
+  <a class="sidebar-link active" data-page="overview">
+    <span class="dot dot-purple"></span>平台概覽
+  </a>
+  <a class="sidebar-link" data-page="architecture">
+    <span class="dot dot-purple"></span>架構 & 技術堆疊
+  </a>
+  <a class="sidebar-link" data-page="multi-source">
+    <span class="dot dot-purple"></span>多來源整合
+  </a>
+  <a class="sidebar-link" data-page="core-modules">
+    <span class="dot dot-purple"></span>核心模組
+  </a>
+  <a class="sidebar-link" data-page="order-flow">
+    <span class="dot dot-purple"></span>訂單處理流程
+  </a>
+  <a class="sidebar-link" data-page="multi-output">
+    <span class="dot dot-purple"></span>多輸出通路
+  </a>
+  <a class="sidebar-link" data-page="roadmap">
+    <span class="dot dot-purple"></span>待開發功能
+  </a>
+
+  <div class="sidebar-section">Part 2 — Vibe Coding</div>
+  <a class="sidebar-link" data-page="vibe-intro">
+    <span class="dot dot-green"></span>什麼是 Vibe Coding
+  </a>
+  <a class="sidebar-link" data-page="pm-role">
+    <span class="dot dot-green"></span>PM 的角色
+  </a>
+  <a class="sidebar-link" data-page="it-role">
+    <span class="dot dot-green"></span>IT 的角色
+  </a>
+  <a class="sidebar-link" data-page="workflow">
+    <span class="dot dot-green"></span>完整協作流程
+  </a>
+
+  <div class="sidebar-section">Part 3 — 實戰案例</div>
+  <a class="sidebar-link" data-page="tool-intro">
+    <span class="dot dot-orange"></span>採購工具介紹
+  </a>
+  <a class="sidebar-link" data-page="tool-timeline">
+    <span class="dot dot-orange"></span>開發歷程
+  </a>
+  <a class="sidebar-link" data-page="tool-prompts">
+    <span class="dot dot-orange"></span>關鍵 Prompts
+  </a>
+  <a class="sidebar-link" data-page="tool-challenges">
+    <span class="dot dot-orange"></span>挑戰 & 經驗
+  </a>
+
+  <div class="sidebar-section" style="margin-top:auto; padding-bottom:20px;"></div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="main">
+
+<!-- ============================================================ -->
+<!-- PAGE: overview                                                -->
+<!-- ============================================================ -->
+<div class="page active" id="overview">
+  <div class="page-header header-purple">
+    <h2>PRESCOMART 平台概覽</h2>
+    <p>多來源 → 單平台 → 多輸出 的統一電商 ERP</p>
+  </div>
+
+  <div class="highlight hl-purple">
+    <p><strong>PRESCOMART</strong> 是一套統一商務管理平台（Unified Commerce ERP），將多個供應商來源整合到單一管理後台，再同步上架至多個銷售通路。目標是讓營運團隊在一個地方管理<strong>商品、訂單、財務、客服</strong>。</p>
+  </div>
+
+  <h3>核心概念：三段式架構</h3>
+  <div class="flow" style="justify-content: center; margin: 24px 0;">
+    <div class="flow-group">
+      <div class="flow-box">阿里巴巴 1688</div>
+      <div class="flow-box">供應商 API</div>
+      <div class="flow-box">倉庫系統</div>
+      <div class="flow-box">手動建立</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled purple" style="font-size:0.9em; padding: 14px 24px;">
+      <strong>PRESCOMART</strong><br>統一管理平台
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-group">
+      <div class="flow-box filled green">博客來</div>
+      <div class="flow-box filled green">IOpenmall</div>
+      <div class="flow-box filled green">自營店面</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>平台數據一覽</h3>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--purple);">4+</div>
+      <div class="stat-label">供應商來源</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--green);">3+</div>
+      <div class="stat-label">銷售通路</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--blue);">8</div>
+      <div class="stat-label">核心模組</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--orange);">50+</div>
+      <div class="stat-label">API 端點</div>
+    </div>
+  </div>
+
+  <h3>主要模組</h3>
+  <div class="cards cards-4">
+    <div class="card card-accent accent-purple">
+      <h4>商品管理</h4>
+      <p>SKU、變體、定價、庫存、圖片、來源追蹤</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>訂單管理</h4>
+      <p>全通路訂單、狀態流程、利潤自動計算</p>
+    </div>
+    <div class="card card-accent accent-green">
+      <h4>上架管理</h4>
+      <p>各平台客製定價、批量上架 / 同步</p>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>財務模組</h4>
+      <p>平台結算、供應商付款、利潤分析、匯率</p>
+    </div>
+    <div class="card card-accent accent-red">
+      <h4>客服系統 <span class="badge badge-gray">以後</span></h4>
+      <p>即時聊天 (WebSocket)、工單、客服排程</p>
+    </div>
+    <div class="card card-accent accent-purple">
+      <h4>數據分析</h4>
+      <p>營收趨勢、平台對比、商品排行、供應商分析</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>運費設定</h4>
+      <p>多種寄送方式、依重量 / 尺寸計費規則</p>
+    </div>
+    <div class="card card-accent accent-green">
+      <h4>優惠券</h4>
+      <p>百分比 / 固定金額 / 免運，指定商品或分類</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: architecture                                            -->
+<!-- ============================================================ -->
+<div class="page" id="architecture">
+  <div class="page-header header-purple">
+    <h2>架構 & 技術堆疊</h2>
+    <p>Monorepo 結構、現代技術選型</p>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <h3>技術堆疊</h3>
+      <table>
+        <tr><th>層級</th><th>技術</th></tr>
+        <tr><td>前端框架</td><td>Next.js 14.2 (App Router) + React 18 + TypeScript 5.7</td></tr>
+        <tr><td>UI 樣式</td><td>TailwindCSS 3.4 + Lucide 圖示</td></tr>
+        <tr><td>表格 / 圖表</td><td>TanStack React Table + Recharts</td></tr>
+        <tr><td>表單驗證</td><td>React Hook Form + Zod</td></tr>
+        <tr><td>後端 API</td><td>Next.js API Routes (RESTful)</td></tr>
+        <tr><td>認證</td><td>NextAuth.js 5 + bcrypt</td></tr>
+        <tr><td>資料庫</td><td>PostgreSQL + Prisma 6.4 ORM</td></tr>
+        <tr><td>即時通訊</td><td>Socket.io (客服聊天)</td></tr>
+        <tr><td>建置工具</td><td>pnpm 10 + Turborepo 2.4</td></tr>
+        <tr><td>測試</td><td>Playwright (E2E) + Vitest (單元)</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Monorepo 結構</h3>
+      <pre class="codeblock">PRESCOMART/
+├── apps/
+│   └── web/                 # Next.js 主應用
+│       ├── src/app/         # App Router 頁面
+│       │   ├── (auth)/      # 登入頁
+│       │   ├── (dashboard)/ # 管理後台
+│       │   ├── store/       # 客戶端店面
+│       │   └── api/         # 後端 API
+│       ├── src/components/  # React 元件
+│       └── src/lib/         # 工具函式
+├── packages/
+│   ├── db/                  # Prisma Schema
+│   │   └── prisma/
+│   │       ├── schema.prisma
+│   │       └── seed.ts
+│   ├── connectors/          # 來源 & 平台適配器
+│   │   └── src/
+│   │       ├── sources/     # 供應商適配器
+│   │       └── platforms/   # 平台適配器
+│   └── shared/              # 共用型別 & 工具
+└── package.json</pre>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>權限與角色 (RBAC)</h3>
+  <table>
+    <tr><th>角色</th><th>權限範圍</th><th>適用對象</th></tr>
+    <tr>
+      <td><span class="badge badge-purple">ADMIN</span></td>
+      <td>完整系統存取：商品、訂單、財務、平台、使用者管理、系統設定</td>
+      <td>系統管理員</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-blue">OPERATOR</span></td>
+      <td>訂單管理、商品管理、平台管理、財務、數據分析</td>
+      <td>營運人員</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-green">SUPPORT</span></td>
+      <td>客服工單、即時聊天、有限訂單資訊查詢</td>
+      <td>客服人員</td>
+    </tr>
+  </table>
+
+  <h3>主要 API 端點</h3>
+  <div class="cards cards-3">
+    <div class="card"><h4>商品 & 來源</h4><p><code>/api/products</code> <code>/api/sources</code> <code>/api/product-stream</code> — CRUD、同步、串接外部商品</p></div>
+    <div class="card"><h4>訂單 & 上架</h4><p><code>/api/orders</code> <code>/api/listings</code> — 訂單管理、批量上架、狀態更新</p></div>
+    <div class="card"><h4>平台 & Webhook</h4><p><code>/api/platforms</code> <code>/api/webhooks</code> — 平台連線、即時通知接收</p></div>
+    <div class="card"><h4>財務</h4><p><code>/api/finance/*</code> — 結算、付款、交易、利潤分析、匯率</p></div>
+    <div class="card"><h4>客服</h4><p><code>/api/support/*</code> — 聊天 Session、工單、訊息</p></div>
+    <div class="card"><h4>分析 & 其他</h4><p><code>/api/analytics/*</code> <code>/api/coupons</code> <code>/api/shipping</code></p></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: multi-source                                            -->
+<!-- ============================================================ -->
+<div class="page" id="multi-source">
+  <div class="page-header header-purple">
+    <h2>多來源整合 (Input)</h2>
+    <p>供應商商品自動匯入、統一管理</p>
+  </div>
+
+  <p>PRESCOMART 的商品可以從多個來源匯入，每個來源透過對應的 <strong>Adapter</strong> 處理 API 格式差異，統一轉換後存入系統。</p>
+
+  <div class="cards cards-2">
+    <div class="card card-accent accent-purple">
+      <h4>阿里巴巴 1688</h4>
+      <p>透過 <code>Source1688Adapter</code> 串接 product-stream-api 服務，自動同步批發商品資料、價格、圖片。支援分頁載入，保留原始 API 回應供除錯。</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>供應商 REST API</h4>
+      <p>通用 <code>SourceApiAdapter</code>，可自訂 endpoint URL、認證方式、欄位映射 (syncConfig)。一個 Adapter 支援任何提供 REST API 的供應商。</p>
+    </div>
+    <div class="card card-accent accent-green">
+      <h4>倉庫系統 API</h4>
+      <p>與倉庫管理系統串接，取得即時庫存數量與物流資訊。支援 Webhook 接收庫存變動通知。</p>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>手動建立</h4>
+      <p>後台直接新增商品，填寫品名、價格、SKU、圖片等資料。適合少量商品或無 API 的供應商。</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>來源同步機制</h3>
+  <div class="highlight hl-purple">
+    <p>每個來源連線 (<code>ProductSource</code>) 都有獨立的同步設定與狀態追蹤。透過 <code>ProductSourceLink</code> 將外部商品映射到系統商品，支援<strong>雙向追蹤</strong>。</p>
+  </div>
+
+  <div class="flow" style="justify-content: center;">
+    <div class="flow-box">設定來源</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">測試連線</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled purple">啟動同步</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">PENDING</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled blue">IN_PROGRESS</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled green">SUCCESS</div>
+  </div>
+
+  <h3>資料保留策略</h3>
+  <ul>
+    <li><strong>原始資料保留：</strong>每次同步的 Raw API Response 都會儲存，方便除錯與對帳</li>
+    <li><strong>欄位映射：</strong>透過 <code>syncConfig</code> 定義外部欄位 → 系統欄位的對應規則</li>
+    <li><strong>衝突處理：</strong>同步時自動比對 externalId，新增或更新既有商品</li>
+    <li><strong>錯誤追蹤：</strong>同步失敗會記錄錯誤原因，支援重試</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: core-modules                                            -->
+<!-- ============================================================ -->
+<div class="page" id="core-modules">
+  <div class="page-header header-purple">
+    <h2>核心模組詳解</h2>
+    <p>訂單、財務、客服的完整功能</p>
+  </div>
+
+  <h3>訂單管理</h3>
+  <div class="cols cols-wide">
+    <div>
+      <p>所有通路的訂單匯入單一後台，支援完整的生命週期管理。每筆訂單自動計算利潤：<strong>營收 - 商品成本 - 運費 - 平台佣金 = 淨利潤</strong>。</p>
+      <div class="flow">
+        <div class="flow-box">PENDING</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box filled blue">CONFIRMED</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box filled orange">PROCESSING</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box filled purple">SHIPPED</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box filled green">DELIVERED</div>
+      </div>
+      <ul>
+        <li>批量狀態更新 & 批量同步平台訂單</li>
+        <li>退款處理流程（記錄退款金額、原因）</li>
+        <li>每個 OrderItem 追蹤供應商來源 & 成本</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card card-accent accent-blue" style="background: var(--blue-50);">
+        <h4>訂單資料結構</h4>
+        <ul>
+          <li><code>Order</code> — 主訂單（平台、客戶、金額）</li>
+          <li><code>OrderItem</code> — 商品明細（數量、單價、成本）</li>
+          <li>自動計算：revenue, cost, commission, shippingCost, profit</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>財務模組</h3>
+  <div class="cards cards-2">
+    <div class="card card-accent accent-orange">
+      <h4>平台結算 (Settlements)</h4>
+      <p>追蹤各平台應收的佣金支付。按期間分組，紀錄結算金額、已收款狀態。確保平台出帳金額與系統計算吻合。</p>
+    </div>
+    <div class="card card-accent accent-red">
+      <h4>供應商付款 (Supplier Payments)</h4>
+      <p>管理應付供應商的貨款。支援外幣帳單 + 匯率轉換（<code>ExchangeRate</code> 模型）。追蹤發票編號、付款狀態。</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>財務交易 (Transactions)</h4>
+      <p>所有金流進出的完整記錄：平台收入、供應商付款、運費支出、佣金、退款、調整項。每筆可關聯到訂單或結算單。</p>
+    </div>
+    <div class="card card-accent accent-purple">
+      <h4>利潤分析 (Margins)</h4>
+      <p>按商品、按訂單的利潤率分析。找出最賺錢和最虧錢的商品，輔助定價與採購決策。</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>客服系統</h3>
+  <div class="cols cols-2">
+    <div>
+      <h4>即時聊天 (Live Chat)</h4>
+      <ul>
+        <li>WebSocket (Socket.io) 即時雙向通訊</li>
+        <li>自動顯示客戶資料 & 訂單歷史</li>
+        <li>聊天分類路由：訂單問題、商品詢問、退換貨、配送、技術、其他</li>
+        <li>客服可用狀態管理（在線 / 忙碌 / 離線）</li>
+        <li>罐頭回覆 + 鍵盤快捷鍵</li>
+        <li>滿意度評分系統</li>
+      </ul>
+    </div>
+    <div>
+      <h4>工單系統 (Tickets)</h4>
+      <ul>
+        <li>優先度：<span class="badge badge-gray">LOW</span> <span class="badge badge-blue">MEDIUM</span> <span class="badge badge-orange">HIGH</span> <span class="badge badge-red">URGENT</span></li>
+        <li>狀態流程：OPEN → IN_PROGRESS → WAITING_CUSTOMER → RESOLVED → CLOSED</li>
+        <li>指派客服人員</li>
+        <li>內部 / 外部訊息區分（內部備註不對外顯示）</li>
+        <li>附件支援</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: order-flow                                              -->
+<!-- ============================================================ -->
+<div class="page" id="order-flow">
+  <div class="page-header header-purple">
+    <h2>訂單處理流程</h2>
+    <p>不同通路的訂單如何進入系統、處理、出貨</p>
+  </div>
+
+  <div class="highlight hl-purple">
+    <p>PRESCOMART 接收來自多個銷售平台的訂單，每個平台的訂單格式、狀態碼、推送方式都不同。系統透過<strong>統一的訂單模型</strong>將差異抹平，讓營運團隊用同一套流程處理所有通路。</p>
+  </div>
+
+  <h3>各通路訂單進入方式</h3>
+  <div class="cards cards-3">
+    <div class="card card-accent accent-green">
+      <h4>博客來 Books.com.tw</h4>
+      <ul>
+        <li>透過 API 定期拉取新訂單 (Pull)</li>
+        <li>訂單包含：客戶資訊、商品明細、配送地址</li>
+        <li>佣金率由平台連線設定自動帶入</li>
+        <li>狀態回寫：出貨後推送物流單號回博客來</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>IOpenmall</h4>
+      <ul>
+        <li>Webhook 即時推送訂單 (Push)</li>
+        <li>系統接收後自動建立訂單記錄</li>
+        <li>支援測試 / 正式環境切換</li>
+        <li>訂單狀態雙向同步</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>自營店面</h4>
+      <ul>
+        <li>客戶在 <code>/store/[slug]</code> 下單</li>
+        <li>訂單直接寫入系統資料庫</li>
+        <li>無需額外同步，即時可見</li>
+        <li>購物車 → 結帳 → 訂單確認</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>統一處理流程</h3>
+  <p>不論訂單來自哪個通路，進入系統後走同一套生命週期：</p>
+
+  <div class="flow" style="justify-content: center; margin: 20px 0;">
+    <div class="flow-box" style="border-color: var(--gray-400);">平台推送<br>/ API 拉取</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled purple">訂單建立<br><small>PENDING</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled blue">確認<br><small>CONFIRMED</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled orange">處理中<br><small>PROCESSING</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled purple">出貨<br><small>SHIPPED</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled green">送達<br><small>DELIVERED</small></div>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <h3>每筆訂單自動計算</h3>
+      <table>
+        <tr><th>項目</th><th>來源</th></tr>
+        <tr><td>營收 (Revenue)</td><td>平台售價 × 數量</td></tr>
+        <tr><td>商品成本 (Cost)</td><td>供應商進貨價 × 數量</td></tr>
+        <tr><td>運費成本 (Shipping)</td><td>運費規則自動計算</td></tr>
+        <tr><td>平台佣金 (Commission)</td><td>營收 × 平台佣金率</td></tr>
+        <tr><td style="font-weight:600; color:var(--green);">淨利潤 (Profit)</td><td style="font-weight:600;">營收 - 成本 - 運費 - 佣金</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>跨平台差異處理</h3>
+      <table>
+        <tr><th>差異項</th><th>系統處理</th></tr>
+        <tr><td>訂單格式不同</td><td>Platform Adapter 統一轉換</td></tr>
+        <tr><td>狀態碼不同</td><td>映射到統一的 5 階段狀態</td></tr>
+        <tr><td>佣金計算方式</td><td>每個 PlatformConnection 獨立設定</td></tr>
+        <tr><td>退款流程</td><td>統一退款 API，回寫各平台</td></tr>
+        <tr><td>批量操作</td><td>bulk-sync / bulk-update 跨平台</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>訂單同步機制</h3>
+  <div class="cards cards-2">
+    <div class="card card-accent accent-purple">
+      <h4>Pull 模式（定期拉取）</h4>
+      <p>適用於不支援 Webhook 的平台（如博客來）。系統排程定期呼叫平台 API 抓取新訂單與狀態更新。透過 <code>bulk-sync</code> 端點批量同步。</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>Push 模式（即時推送）</h4>
+      <p>平台透過 <code>/api/webhooks/platforms</code> 推送訂單事件。系統即時接收並處理，延遲最低。適用於支援 Webhook 的平台（如 IOpenmall）。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: roadmap                                                 -->
+<!-- ============================================================ -->
+<div class="page" id="roadmap">
+  <div class="page-header header-purple">
+    <h2>待開發功能 Roadmap</h2>
+    <p>平台還需要什麼才能完整運作</p>
+  </div>
+
+  <div class="highlight hl-orange">
+    <p>以下是 PRESCOMART 要成為完整電商 ERP 還需要補齊的模組。按優先順序和相依性分為三個階段。</p>
+  </div>
+
+  <!-- Phase 1 -->
+  <h3 style="color:var(--red);">Phase 1 — 核心營運必備（高優先）</h3>
+  <div class="cards cards-2">
+    <div class="card card-accent accent-red">
+      <h4>物流管理</h4>
+      <p>目前缺乏完整的物流串接，是上線最大的缺口。</p>
+      <ul>
+        <li><strong>B2C 宅配：</strong>物流商 API 串接（黑貓、新竹物流等），自動產生託運單號、列印面單</li>
+        <li><strong>B2 統一 / C2 統一：</strong>統一超商物流串接，支援店到店（C2C）及大宗寄倉（B2C）</li>
+        <li><strong>超商取貨：</strong>7-11、全家、萊爾富門市選擇 → 物流單建立 → 到店通知</li>
+        <li><strong>物流狀態追蹤：</strong>統一追蹤介面，自動更新訂單出貨狀態</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-red">
+      <h4>金流 / 支付 — Payuni（PAYUNi）</h4>
+      <p>串接 Payuni 統一金流平台，處理所有付款方式。</p>
+      <ul>
+        <li><strong>信用卡：</strong>一次付清、分期付款</li>
+        <li><strong>ATM 虛擬帳號：</strong>產生繳費帳號、到帳通知</li>
+        <li><strong>超商代碼繳費：</strong>產生繳費代碼</li>
+        <li><strong>付款狀態回調：</strong>Webhook 接收付款成功/失敗通知</li>
+        <li><strong>退款 API：</strong>整合退款流程</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-red">
+      <h4>電子發票</h4>
+      <p>台灣電商必備的發票管理功能。</p>
+      <ul>
+        <li><strong>開立：</strong>訂單完成後自動開立電子發票（B2C / B2B）</li>
+        <li><strong>載具：</strong>支援手機條碼、自然人憑證、公司統編</li>
+        <li><strong>作廢 / 折讓：</strong>退貨時自動處理發票作廢或折讓單</li>
+        <li><strong>申報：</strong>與財務模組整合，輔助營業稅申報</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-red">
+      <h4>庫存 / 倉儲管理 (WMS)</h4>
+      <p>目前只有基本庫存欄位，需要完整倉儲管理。</p>
+      <ul>
+        <li><strong>多倉庫：</strong>不同倉庫（楊梅、三峽等）獨立庫存</li>
+        <li><strong>進銷存：</strong>進貨、銷貨、調撥、盤點完整流程</li>
+        <li><strong>安全庫存：</strong>低於閾值自動警示或觸發採購建議</li>
+        <li><strong>批號 / 效期：</strong>食品類必備的批號追蹤與效期管理</li>
+        <li><strong>庫存同步：</strong>各平台即時扣庫存，避免超賣</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <h3 style="color:var(--orange); margin-top: 32px;">Phase 2 — 營運效率提升（中優先）</h3>
+  <div class="cards cards-2">
+    <div class="card card-accent accent-orange">
+      <h4>退貨管理 (RMA)</h4>
+      <p>完整的逆物流流程管理。</p>
+      <ul>
+        <li><strong>退貨申請：</strong>客戶端或客服建立退貨單</li>
+        <li><strong>退貨原因分類：</strong>瑕疵、錯寄、不符預期等</li>
+        <li><strong>逆物流：</strong>安排取件或客戶寄回，追蹤退貨物流狀態</li>
+        <li><strong>驗收 & 入庫：</strong>退貨到倉後驗收，良品重新入庫</li>
+        <li><strong>退款觸發：</strong>驗收通過後自動走退款 + 發票折讓流程</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>帳務管理（進階）</h4>
+      <p>在現有財務模組基礎上，補齊完整帳務功能。</p>
+      <ul>
+        <li><strong>應收帳款：</strong>各平台結算金額追蹤、帳齡分析</li>
+        <li><strong>應付帳款：</strong>供應商付款排程、付款條件管理</li>
+        <li><strong>對帳：</strong>平台匯入帳單 vs 系統計算自動比對差異</li>
+        <li><strong>損益報表：</strong>按月/季/年、按平台/品類的損益匯總</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>罰款管理</h4>
+      <p>電商平台常見的罰款追蹤。</p>
+      <ul>
+        <li><strong>遲出貨罰款：</strong>超過平台規定出貨時限的罰款紀錄</li>
+        <li><strong>缺貨罰款：</strong>接單後無法出貨的罰款</li>
+        <li><strong>品質罰款：</strong>客訴率過高、退貨率過高的罰款</li>
+        <li><strong>罰款統計：</strong>按平台、按月匯總，計入成本分析</li>
+        <li><strong>預警機制：</strong>接近出貨期限自動提醒避免罰款</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>客戶中心 / CRM — Uniopen</h4>
+      <p>統一客戶資料管理，提升回購率。</p>
+      <ul>
+        <li><strong>客戶合併：</strong>跨平台的同一客戶資料合併識別</li>
+        <li><strong>購買歷史：</strong>完整的跨通路消費記錄</li>
+        <li><strong>客戶分群：</strong>RFM 分析、標籤系統</li>
+        <li><strong>會員等級：</strong>累積消費 / 頻率決定等級與權益</li>
+        <li><strong>Uniopen 整合：</strong>串接 Uniopen 客戶中心平台</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <h3 style="color:var(--blue); margin-top: 32px;">Phase 3 — 規模化 & 合規（長期）</h3>
+  <div class="cards cards-2">
+    <div class="card card-accent accent-blue">
+      <h4>供應商合約管理</h4>
+      <ul>
+        <li><strong>合約建立：</strong>記錄合約期間、付款條件（月結30/60天等）、最低訂購量</li>
+        <li><strong>價格協議：</strong>階梯定價、促銷期間特價、匯率連動</li>
+        <li><strong>績效考核：</strong>交貨準時率、品質合格率、缺貨率</li>
+        <li><strong>到期提醒：</strong>合約即將到期自動通知續約</li>
+        <li><strong>文件管理：</strong>合約 PDF 上傳、版本管理</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>平台合約管理</h4>
+      <ul>
+        <li><strong>合約條款：</strong>佣金率、結算週期、罰款條款、保證金</li>
+        <li><strong>費用結構：</strong>上架費、月費、成交手續費拆分記錄</li>
+        <li><strong>SLA 追蹤：</strong>出貨時限、回覆時限、退貨處理時限</li>
+        <li><strong>自動核對：</strong>平台收費 vs 合約條款自動比對異常</li>
+        <li><strong>多平台比較：</strong>各平台利潤率、費用率橫向對比</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>建議開發順序（TODO）</h3>
+  <table>
+    <tr><th>#</th><th>項目</th><th>優先度</th><th>原因</th><th>前置相依</th></tr>
+    <tr>
+      <td>1</td>
+      <td><strong>庫存 / 倉儲管理</strong></td>
+      <td><span class="badge badge-red">P0</span></td>
+      <td>多平台共用庫存是防止超賣的基礎，後續物流、退貨都依賴它</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>金流串接 (Payuni)</strong></td>
+      <td><span class="badge badge-red">P0</span></td>
+      <td>自營店面無法收款就無法上線，也影響退款流程</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>物流管理</strong></td>
+      <td><span class="badge badge-red">P0</span></td>
+      <td>沒有物流就無法出貨，是營運的最基本需求</td>
+      <td>庫存管理（扣庫存）</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>電子發票</strong></td>
+      <td><span class="badge badge-red">P0</span></td>
+      <td>台灣法規要求，沒有發票不能合法營業</td>
+      <td>金流（付款完成觸發開立）</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>退貨管理</strong></td>
+      <td><span class="badge badge-orange">P1</span></td>
+      <td>電商退貨率 5-15%，需要系統化處理</td>
+      <td>庫存 + 物流 + 發票（折讓）</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong>罰款管理</strong></td>
+      <td><span class="badge badge-orange">P1</span></td>
+      <td>出貨超時罰款直接影響利潤，需要預警</td>
+      <td>物流（出貨時限追蹤）</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><strong>帳務進階</strong></td>
+      <td><span class="badge badge-orange">P1</span></td>
+      <td>平台對帳是每月必做的工作，手動比對耗時</td>
+      <td>發票 + 金流</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><strong>客戶中心 (Uniopen)</strong></td>
+      <td><span class="badge badge-orange">P1</span></td>
+      <td>跨平台客戶識別對行銷和客服都很重要</td>
+      <td>訂單管理（客戶資料累積）</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><strong>供應商合約</strong></td>
+      <td><span class="badge badge-blue">P2</span></td>
+      <td>供應商數量多了之後需要系統化管理</td>
+      <td>供應商付款模組</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><strong>平台合約</strong></td>
+      <td><span class="badge badge-blue">P2</span></td>
+      <td>多平台費用結構複雜，需要自動核對</td>
+      <td>罰款 + 帳務</td>
+    </tr>
+  </table>
+
+  <div class="highlight hl-purple" style="margin-top: 24px;">
+    <p><strong>補充建議 TODO：</strong></p>
+    <ul style="margin: 8px 0 0 16px;">
+      <li><strong>通知中心：</strong>整合 Email / LINE / SMS 通知 — 出貨通知、到貨通知、付款提醒、庫存警示</li>
+      <li><strong>報表匯出：</strong>營運日報 / 週報 / 月報自動產出（PDF / Excel），含各平台銷售對比</li>
+      <li><strong>促銷活動管理：</strong>平台活動排程（雙11、年中慶等）、活動價格自動切換、庫存預留</li>
+      <li><strong>操作日誌 & 審計：</strong>現有 AuditLog 擴充，關鍵操作（改價、退款、刪單）需主管審核</li>
+      <li><strong>API Rate Limiting：</strong>各平台 API 有調用頻率限制，需加入排隊機制避免被封鎖</li>
+      <li><strong>多語系 / 多幣別：</strong>若擴展到海外市場，需要 i18n 和多幣別定價支援</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: multi-output                                            -->
+<!-- ============================================================ -->
+<div class="page" id="multi-output">
+  <div class="page-header header-purple">
+    <h2>多輸出通路 (Output)</h2>
+    <p>一鍵上架多平台、自動同步</p>
+  </div>
+
+  <h3>銷售平台整合</h3>
+  <div class="cards cards-3">
+    <div class="card card-accent accent-green">
+      <h4>博客來 Books.com.tw</h4>
+      <p>台灣最大圖書 / 商品電商平台。完整 API 串接：商品上架推送、訂單同步拉取、庫存更新。支援平台佣金率設定。</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>IOpenmall</h4>
+      <p>多廠商電商平台。支援測試環境 / 正式環境切換。Listing 雙向同步，Webhook 接收訂單通知。</p>
+    </div>
+    <div class="card card-accent accent-orange">
+      <h4>可擴充架構</h4>
+      <p>基於 <strong>Base Platform Adapter</strong> 設計模式。新增平台只需實作標準介面：pushListing、pullOrders、syncStock。大幅降低串接新通路的成本。</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>上架管理流程</h3>
+  <div class="flow" style="justify-content: center;">
+    <div class="flow-box">選擇商品</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">設定平台價格</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">撰寫平台描述</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled purple">批量上架</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box filled green">同步追蹤</div>
+  </div>
+  <ul>
+    <li><strong>批量操作：</strong>bulk-create、bulk-push、bulk-update、bulk-sync、bulk-delete</li>
+    <li><strong>每個 Listing 獨立：</strong>各平台可以有不同價格、不同商品描述、不同圖片組合</li>
+    <li><strong>狀態追蹤：</strong>DRAFT → PENDING → ACTIVE → INACTIVE / ERROR</li>
+  </ul>
+
+  <hr>
+
+  <h3>自營店面 (Dynamic Storefronts)</h3>
+  <div class="highlight hl-green">
+    <p>每個 PlatformConnection 自動產生客戶端購物頁面：<code>/store/[platformSlug]</code></p>
+    <p style="margin-top:8px;">例如：<code>/store/iopenmall-demo</code>、<code>/store/books-com-test</code></p>
+  </div>
+  <div class="cards cards-4">
+    <div class="card"><h4>商品瀏覽</h4><p>分類篩選、排序、搜尋</p></div>
+    <div class="card"><h4>購物車</h4><p>localStorage 管理、即時計算</p></div>
+    <div class="card"><h4>優惠券</h4><p>結帳時套用折扣碼</p></div>
+    <div class="card"><h4>結帳</h4><p>填寫收件資訊、確認訂單</p></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: vibe-intro                                              -->
+<!-- ============================================================ -->
+<div class="page" id="vibe-intro">
+  <div class="page-header header-green">
+    <h2>什麼是 Vibe Coding？</h2>
+    <p>用自然語言驅動的開發方式</p>
+  </div>
+
+  <div class="highlight hl-green">
+    <p><strong>Vibe Coding</strong> 不是「讓 AI 寫所有程式」，而是用 AI 作為<strong>溝通媒介</strong>，讓 PM 和 IT 都能快速產出「看得見的東西」來對齊需求。</p>
+  </div>
+
+  <h3>傳統開發 vs Vibe Coding</h3>
+  <div class="vs">
+    <div class="vs-side" style="border-top: 3px solid var(--red);">
+      <h4 style="color:var(--red);">傳統開發流程</h4>
+      <ol>
+        <li>PM 花 3 天寫 PRD 文件</li>
+        <li>IT 花 1 天讀文件、開會討論</li>
+        <li>IT 花 1-2 週開發</li>
+        <li>PM 看到成品：「不是這樣...」</li>
+        <li>來回修改 2-3 輪</li>
+        <li>整個週期：<strong>3-6 週</strong></li>
+      </ol>
+      <div class="highlight hl-red" style="margin-top:12px;">
+        <p>核心問題：<strong>文字描述永遠有落差</strong>。PM 腦中的畫面和 IT 理解的畫面，很難完全一致。</p>
+      </div>
+    </div>
+    <div class="vs-center">vs</div>
+    <div class="vs-side" style="border-top: 3px solid var(--green);">
+      <h4 style="color:var(--green);">Vibe Coding 流程</h4>
+      <ol>
+        <li>PM 用 Claude 做出原型畫面（半天）</li>
+        <li>IT 看到畫面，立刻理解需求</li>
+        <li>IT 用原型展示技術限制</li>
+        <li>雙方對著畫面討論、快速對齊</li>
+        <li>IT 用 Claude 快速實作</li>
+        <li>整個週期：<strong>3-7 天</strong></li>
+      </ol>
+      <div class="highlight hl-green" style="margin-top:12px;">
+        <p>核心改變：<strong>用「看得見的東西」取代文字溝通</strong>。雙方對著同一個畫面討論，誤差趨近於零。</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>關鍵思維轉變</h3>
+  <div class="cards cards-3">
+    <div class="card card-accent accent-green">
+      <h4>原型 &gt; 文件</h4>
+      <p>一個可互動的原型畫面，比 10 頁 PRD 更能傳達需求。AI 讓做原型的成本降到趨近於零。</p>
+    </div>
+    <div class="card card-accent accent-green">
+      <h4>展示 &gt; 解釋</h4>
+      <p>「為什麼這樣不行」用說的很難懂。但做一個 demo 讓對方自己看到問題，秒懂。</p>
+    </div>
+    <div class="card card-accent accent-green">
+      <h4>迭代 &gt; 一次到位</h4>
+      <p>不追求第一版就完美。先做出來、看到問題、快速修正。每次迭代只要幾分鐘。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: pm-role                                                 -->
+<!-- ============================================================ -->
+<div class="page" id="pm-role">
+  <div class="page-header header-green">
+    <h2>PM 的角色</h2>
+    <p>理解使用者、做出原型、定義 Input/Output</p>
+  </div>
+
+  <div class="highlight hl-green">
+    <p><strong>PM 的核心工作是用 Claude 做出「有完整元素的畫面原型」——不需要實際功能，但畫面上要有所有使用者會看到和操作的元素。</strong></p>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <h3 style="color:var(--green);">PM 負責的事</h3>
+      <ul>
+        <li><strong>理解使用者的真實工作流程</strong>——他們現在怎麼做？哪裡最痛？</li>
+        <li><strong>定義 Input：</strong>使用者會輸入什麼資料？資料從哪裡來？什麼格式？</li>
+        <li><strong>定義 Output：</strong>最終要產出什麼？Excel？PDF？網頁畫面？給誰看？</li>
+        <li><strong>排版與資訊架構：</strong>頁面上要有哪些欄位、按鈕、表格？</li>
+        <li><strong>用假資料填充：</strong>讓原型看起來像真的在運作</li>
+        <li><strong>標注互動意圖：</strong>點了這個按鈕預期會發生什麼？</li>
+        <li><strong>考慮邊界情況：</strong>空的時候長怎樣？載入中？出錯了？</li>
+        <li><strong>資訊安全把關：</strong>哪些資料是敏感的？誰能看到什麼？權限怎麼分？</li>
+        <li><strong>準備 API 串接資料：</strong>找到第三方的 API 文件、申請帳號、整理基本連線資訊（endpoint、key、規格書），交給 IT 實作</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:var(--gray-400);">PM 不用管的事</h3>
+      <ul>
+        <li>資料庫怎麼設計（IT 的事）</li>
+        <li>API <strong>怎麼串接</strong>（IT 的事，但 PM 要準備文件和帳號）</li>
+        <li>效能、可維護性（IT 的事）</li>
+        <li>程式碼品質或架構選擇</li>
+        <li>部署和基礎設施</li>
+      </ul>
+      <div class="highlight hl-orange" style="margin-top:16px;">
+        <p><strong>重點：</strong>PM 的原型不需要「能動」，只需要「看起來對」。但畫面上的<strong>每個元素都要有</strong>——缺了元素，IT 就不知道要做什麼。</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>PM 做原型的步驟</h3>
+  <div class="flow" style="justify-content: center;">
+    <div class="flow-box filled green">1. 訪談使用者</div>
+    <div class="flow-arrow" style="color:var(--green);">→</div>
+    <div class="flow-box filled green">2. 定義 I/O</div>
+    <div class="flow-arrow" style="color:var(--green);">→</div>
+    <div class="flow-box filled green">3. 用 Claude 產出原型</div>
+    <div class="flow-arrow" style="color:var(--green);">→</div>
+    <div class="flow-box filled green">4. 加假資料</div>
+    <div class="flow-arrow" style="color:var(--green);">→</div>
+    <div class="flow-box filled green">5. 交付 IT</div>
+  </div>
+
+  <div class="highlight hl-green" style="margin-top:20px;">
+    <p><strong>PM 最大的價值是「理解使用者的工作流程」</strong>——使用者在什麼情境下用這個功能？手邊有什麼資料？最後要產出什麼給誰？<br>這些是 AI 無法替代的，因為 AI 不認識你的使用者。</p>
+  </div>
+
+  <h3>PM Prompt 範例</h3>
+  <div class="prompt"><span class="label">給 Claude 的 Prompt：</span>
+<span class="user">我要做一個採購單頁面的原型。使用者是採購人員。
+
+他們的工作流程：
+1. 從 Google Sheets 看到商品清單
+2. 選擇要採購的商品，填寫數量和日期
+3. 產出供應商訂單 Excel、倉庫單 Excel、嘜頭標籤
+
+請做出一個頁面，左邊是商品表格（含搜尋、篩選），
+右邊是全域欄位（訂單日期、採購單號、到貨日期），
+上方有三個匯出按鈕。用假資料填充 10 筆商品。</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: it-role                                                 -->
+<!-- ============================================================ -->
+<div class="page" id="it-role">
+  <div class="page-header header-green">
+    <h2>IT 的角色</h2>
+    <p>技術把關、用原型溝通問題、實作完整功能</p>
+  </div>
+
+  <div class="highlight hl-blue">
+    <p><strong>IT 不只是接到需求就寫 code。IT 要能用原型向 PM 和使用者「展示問題」，而不是只用文字解釋。</strong></p>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <h3 style="color:var(--blue);">IT 負責的事</h3>
+      <ul>
+        <li><strong>評估 PM 原型的技術可行性</strong>——哪些能做、哪些有風險</li>
+        <li><strong>用原型展示「為什麼不行」</strong>——做一個 demo 讓 PM 自己看到</li>
+        <li><strong>提出替代方案的原型</strong>——不只說不行，要展示更好的做法</li>
+        <li><strong>設計資料結構 & API</strong>——確保後端能支撐前端需求</li>
+        <li><strong>用 Claude 快速實作</strong>——善用 AI 加速開發</li>
+        <li><strong>效能、安全性、可維護性</strong>——這是 IT 的專業守備範圍</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:var(--red);">IT 不該做的事</h3>
+      <ul>
+        <li>只用文字解釋「為什麼不行」</li>
+        <li>直接說「做不到」卻不給替代方案</li>
+        <li>自己假設使用者需求（那是 PM 的工作）</li>
+        <li>閉門造車、做完才給 PM 看</li>
+      </ul>
+      <div class="highlight hl-red" style="margin-top:12px;">
+        <p>傳統 IT 常犯的錯：花大量時間解釋技術限制，PM 還是聽不懂。<br><strong>解法：做一個 demo 讓 PM 自己體驗問題。</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>實際案例：IT 如何用原型溝通</h3>
+  <div class="timeline">
+    <div class="tl-item">
+      <span class="tl-label">Step 1 — PM 給了原型</span><br>
+      「表格直接顯示所有 5000 筆商品，不需要分頁」
+    </div>
+    <div class="tl-item">
+      <span class="tl-label">Step 2 — IT 做了 demo</span><br>
+      用 Claude 快速做一個載入 5000 筆的頁面 → 開啟後等 3 秒才看到內容，捲動卡頓
+    </div>
+    <div class="tl-item">
+      <span class="tl-label">Step 3 — IT 做了替代方案</span><br>
+      做另一個用「虛擬捲軸 + 搜尋」的版本 → 秒開、捲動流暢
+    </div>
+    <div class="tl-item">
+      <span class="tl-label">Step 4 — PM 自己比較</span><br>
+      兩個版本並排，PM 自己操作後立刻理解為什麼需要虛擬捲軸。<strong>不需要解釋任何技術細節。</strong>
+    </div>
+  </div>
+
+  <div class="highlight hl-green">
+    <p style="font-size:1.05em; text-align:center;"><strong>「讓 PM 自己看到問題」比「跟 PM 解釋問題」有效 100 倍</strong></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: workflow                                                -->
+<!-- ============================================================ -->
+<div class="page" id="workflow">
+  <div class="page-header header-green">
+    <h2>完整協作流程</h2>
+    <p>PM × IT × Claude 的三方協作</p>
+  </div>
+
+  <table>
+    <tr><th>階段</th><th>PM 做的事</th><th>IT 做的事</th><th>產出物</th></tr>
+    <tr>
+      <td><span class="badge badge-green">1 需求</span></td>
+      <td>訪談使用者、觀察工作流程、定義 Input / Output</td>
+      <td>—</td>
+      <td>使用者故事 & I/O 規格</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-green">2 原型</span></td>
+      <td>用 Claude 做出視覺原型（有完整元素、假資料）</td>
+      <td>—</td>
+      <td>HTML 原型畫面</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-blue">3 技術評估</span></td>
+      <td>說明流程意圖、使用者情境</td>
+      <td>評估技術可行性、識別風險</td>
+      <td>可行性分析</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-blue">4 問題溝通</span></td>
+      <td>體驗 IT 做的問題 demo</td>
+      <td><strong>用原型展示問題</strong>、提供替代方案原型</td>
+      <td>調整後的設計共識</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">5 開發</span></td>
+      <td>定期 review、給回饋</td>
+      <td>用 Claude 實作、漸進式交付</td>
+      <td>可用的功能</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-purple">6 迭代</span></td>
+      <td>收集使用者回饋、提出改進</td>
+      <td>快速修改、部署更新</td>
+      <td>持續改善的產品</td>
+    </tr>
+  </table>
+
+  <hr>
+
+  <h3>適合 Vibe Coding 的場景</h3>
+  <div class="cols cols-2">
+    <div class="card card-accent accent-green">
+      <h4>很適合</h4>
+      <ul>
+        <li><strong>內部工具 & 後台系統</strong> — 使用者明確、需求可控</li>
+        <li><strong>資料處理 / 匯出工具</strong> — Input/Output 明確</li>
+        <li><strong>原型驗證 & MVP</strong> — 速度最重要</li>
+        <li><strong>CRUD 頁面</strong> — 模式化、AI 擅長</li>
+        <li><strong>Excel / 報表生成</strong> — 格式規範明確</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-red">
+      <h4>要注意</h4>
+      <ul>
+        <li><strong>AI 生成的 code 需要 review</strong> — 不能盲信</li>
+        <li><strong>複雜商業邏輯</strong> — 仍需人工設計</li>
+        <li><strong>安全性</strong> — AI 可能寫出有漏洞的 code</li>
+        <li><strong>需求不清 = AI 也做不好</strong> — 垃圾進垃圾出</li>
+        <li><strong>不是「不需要工程師」</strong> — 是讓工程師更有效率</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight hl-purple" style="margin-top:20px;">
+    <p style="text-align:center; font-size:1.05em;"><strong>Vibe Coding 不是取代人，是讓 PM 和 IT 都能用「看得見的東西」溝通</strong></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: tool-intro                                              -->
+<!-- ============================================================ -->
+<div class="page" id="tool-intro">
+  <div class="page-header header-orange">
+    <h2>預購採購工具</h2>
+    <p>從零到上線的 AI 開發實戰案例</p>
+  </div>
+
+  <div class="highlight hl-orange">
+    <p><strong>一句話：</strong>從 Google Sheets 讀商品資料 → 業務選品填單 → 自動產出三種格式的 Excel（供應商訂單、大智通倉庫單、嘜頭標籤）</p>
+  </div>
+
+  <h3>資料流</h3>
+  <div class="flow" style="justify-content: center; margin: 20px 0;">
+    <div class="flow-box filled orange">Google Sheets<br><small>商品資料</small></div>
+    <div class="flow-arrow" style="color:var(--orange);">→</div>
+    <div class="flow-box filled orange">選品 & 填單<br><small>數量 / 日期 / 倉別</small></div>
+    <div class="flow-arrow" style="color:var(--orange);">→</div>
+    <div class="flow-group">
+      <div class="flow-box">供應商訂單</div>
+      <div class="flow-box">大智通訂單</div>
+      <div class="flow-box">嘜頭標籤</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="cols cols-wide">
+    <div>
+      <h3>核心功能</h3>
+      <div class="cards" style="grid-template-columns: 1fr 1fr;">
+        <div class="card card-accent accent-orange">
+          <h4>Google Sheets 串接</h4>
+          <ul>
+            <li>多試算表來源支援</li>
+            <li>自動偵測「明細」分頁</li>
+            <li>智慧欄位映射（含空白正規化）</li>
+            <li>自訂標籤辨識</li>
+          </ul>
+        </div>
+        <div class="card card-accent accent-green">
+          <h4>商品選擇表格</h4>
+          <ul>
+            <li>虛擬捲軸（1000+ 筆不卡）</li>
+            <li>品名 / 品號 / 條碼搜尋</li>
+            <li>製造商篩選</li>
+            <li>業務色彩標記</li>
+          </ul>
+        </div>
+        <div class="card card-accent accent-blue">
+          <h4>三種 Excel 輸出</h4>
+          <ul>
+            <li>供應商訂單：精確模板格式</li>
+            <li>大智通倉庫單：雙列表頭 + 色碼</li>
+            <li>嘜頭：一頁三張、標楷體、倉別勾選</li>
+          </ul>
+        </div>
+        <div class="card card-accent accent-purple">
+          <h4>訂單管理</h4>
+          <ul>
+            <li>新建 / 編輯 / 刪除</li>
+            <li>展開明細檢視</li>
+            <li>單筆或批量匯出</li>
+            <li>localStorage 持久化</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>技術概覽</h3>
+      <table>
+        <tr><th>項目</th><th>選擇</th></tr>
+        <tr><td>框架</td><td>Next.js 14 + TS</td></tr>
+        <tr><td>UI</td><td>React 18 + Tailwind</td></tr>
+        <tr><td>資料來源</td><td>Google Sheets API v4</td></tr>
+        <tr><td>認證</td><td>NextAuth + Google OAuth</td></tr>
+        <tr><td>Excel</td><td>xlsx-js-style</td></tr>
+        <tr><td>大量列表</td><td>react-window</td></tr>
+        <tr><td>部署</td><td>AWS Amplify (SSR)</td></tr>
+      </table>
+      <div class="stats" style="flex-direction: column; gap: 12px; margin-top: 20px;">
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--orange);">~1,600</div>
+          <div class="stat-label">行 TypeScript</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--orange);">25</div>
+          <div class="stat-label">次迭代 (commits)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--orange);">~2 天</div>
+          <div class="stat-label">開發週期</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: tool-timeline                                           -->
+<!-- ============================================================ -->
+<div class="page" id="tool-timeline">
+  <div class="page-header header-orange">
+    <h2>開發歷程</h2>
+    <p>25 次 Commit 的完整故事</p>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <h3 style="color:var(--orange);">Day 1 — 3/19（基礎建設）</h3>
+      <div class="timeline">
+        <div class="tl-item">
+          <span class="tl-label">Commit 1-2：專案初始化</span><br>
+          Create Next App → 串接 Google Sheets API → Google OAuth 認證 → Amplify 部署設定
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 3：環境變數修復</span><br>
+          NextAuth SECRET 在 Amplify SSR Lambda 不生效 → 改為 build time 寫入
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 4：Env 內聯打包</span><br>
+          Amplify SSR 不讀 .env → pre-build 階段寫 .env.production，next.config 內聯進 bundle
+        </div>
+      </div>
+
+      <h3 style="color:var(--orange); margin-top:20px;">Day 2 — 3/20（功能爆發）</h3>
+      <div class="timeline">
+        <div class="tl-item">
+          <span class="tl-label">Commit 5-6：核心功能</span><br>
+          全域欄位（日期、備註）→ 每個商品獨立欄位（製造日期、有效日期、倉別、保存期限）
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 7-9：欄位映射之戰</span><br>
+          修正欄位映射（加寬製造商欄、倉別備註）→ 修復「i預購品號」取第二次出現的欄位
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 10-12：嘜頭標籤</span><br>
+          實作嘜頭 Excel 生成 → 修正邊框、字型大小、欄寬、條碼欄位 → 修正 Row 2 樣式
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 13-15：UI & 體驗</span><br>
+          品名移到第一欄 → 可調欄寬、品號/業務欄位、使用者色彩管理
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 16-17：訂單管理</span><br>
+          新增訂單 CRUD → 展開列表、匯出按鈕 → 多資料源、嘜頭改進
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="color:var(--orange);">Day 3 — 4/7（使用者回饋調整）</h3>
+      <div class="timeline">
+        <div class="tl-item">
+          <span class="tl-label">Commit 18-19：PO 流程 & 文件</span><br>
+          修正日期 bug → 新增採購單號工作流 → 撰寫完整 README（43KB）
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 20-22：多試算表支援</span><br>
+          Settings 頁面新增/刪除 Sheets 連結 → 自訂標籤 → Tab 前綴辨識
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 23：欄位白空格正規化</span><br>
+          Google Sheets 欄位含 \n 和 NBSP → strip 所有空白再比對
+        </div>
+        <div class="tl-item">
+          <span class="tl-label">Commit 24-25：最終調整</span><br>
+          訂單列表 UI 精簡 → 每筆可編輯日期 → 製造商篩選器 → 移除日期自動填入
+        </div>
+      </div>
+
+      <div class="highlight hl-orange" style="margin-top:24px;">
+        <p><strong>模式觀察：</strong></p>
+        <ul style="margin:8px 0 0 16px;">
+          <li>Day 1：基礎建設 + 踩環境的坑</li>
+          <li>Day 2：核心功能密集開發（12 commits）</li>
+          <li>Day 3：全是基於<strong>使用者回饋</strong>的微調</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: tool-prompts                                            -->
+<!-- ============================================================ -->
+<div class="page" id="tool-prompts">
+  <div class="page-header header-orange">
+    <h2>關鍵 Prompts 還原</h2>
+    <p>從 Git History 推導的主要開發指令</p>
+  </div>
+
+  <p>以下是根據 25 次 commit 的變更內容，還原的主要開發 Prompt。每個 Prompt 對應一個明確的功能或修正。</p>
+
+  <h3>Phase 1：專案建置 & 基礎串接</h3>
+  <div class="prompt"><span class="label">Prompt #1</span> <span class="comment">— Commit 1-4</span>
+<span class="user">建立一個 Next.js 專案，串接 Google Sheets API 讀取商品資料。
+用 NextAuth 做 Google OAuth 認證。部署到 AWS Amplify（SSR 模式）。
+Google Sheets ID 和 API Key 從環境變數讀取。</span></div>
+
+  <div class="prompt"><span class="label">Prompt #2</span> <span class="comment">— Commit 5-6</span>
+<span class="user">新增全域欄位（訂單日期、有效日期、保存期限、備註）放在頁面上方。
+然後讓每個商品有獨立的欄位：製造日期、有效日期、備註、保存期限天數、
+倉別選擇（楊梅倉 / 三峽倉）。匯出 Excel 按照現有模板格式。</span></div>
+
+  <h3>Phase 2：Excel 輸出 & 欄位修正</h3>
+  <div class="prompt"><span class="label">Prompt #3</span> <span class="comment">— Commit 7-9</span>
+<span class="user">修正欄位映射：加寬製造商欄位、倉庫備註不要顯示「倉別」、品號欄位改用 internalCode。
+另外「i預購品號」這個欄位出現兩次，Column A 是業務名字不是品號，
+要用第二次出現的（Column C）才是真正的品號。</span></div>
+
+  <div class="prompt"><span class="label">Prompt #4</span> <span class="comment">— Commit 10-12</span>
+<span class="user">在供應商訂單 Excel 中加入嘜頭（Case Mark）分頁。
+一頁放三個嘜頭，每個嘜頭包含：
+- 倉別指示（楊梅倉/三峽倉用 ■/□ 符號）
+- 品名、條碼、數量、製造日期、有效日期
+- 箱子尺寸、分類勾選
+- 字型用標楷體，16-28pt</span></div>
+
+  <h3>Phase 3：UI & 訂單管理</h3>
+  <div class="prompt"><span class="label">Prompt #5</span> <span class="comment">— Commit 13-15</span>
+<span class="user">品名移到表格第一個資料欄。加入可調整欄寬功能。
+新增品號欄位和業務欄位。加入使用者管理 Tab，
+可以定義業務人員並分配顏色，表格中根據業務名字自動上色。</span></div>
+
+  <div class="prompt"><span class="label">Prompt #6</span> <span class="comment">— Commit 16-17</span>
+<span class="user">新增訂單管理功能：
+- 可以儲存選好的商品為一筆訂單
+- 訂單列表頁（首頁），可展開看每筆訂單的商品明細
+- 每筆訂單有獨立的匯出按鈕（供應商/大智通/嘜頭）
+- 可以編輯和刪除訂單</span></div>
+
+  <h3>Phase 4：多來源 & 微調</h3>
+  <div class="prompt"><span class="label">Prompt #7</span> <span class="comment">— Commit 18-22</span>
+<span class="user">支援多個 Google Sheets 來源。在設定頁加入管理界面：
+可以新增/刪除 Sheet 連結，每個可以自訂標籤名稱。
+分頁前面加上標籤前綴方便辨識不同來源。
+修正日期 bug，新增採購單號欄位。</span></div>
+
+  <div class="prompt"><span class="label">Prompt #8</span> <span class="comment">— Commit 23-25</span>
+<span class="user">欄位名稱比對 bug：Google Sheets 的欄位標題裡面有換行符號和特殊空白，
+要先把所有空白字元 strip 掉再比對。
+另外：精簡訂單列表 UI、加入製造商篩選下拉、
+移除日期自動填入（使用者反映會填錯）。</span></div>
+
+  <hr>
+
+  <div class="highlight hl-orange">
+    <p><strong>Prompt 寫法觀察：</strong></p>
+    <ul style="margin: 8px 0 0 16px;">
+      <li>每個 Prompt 聚焦在<strong>一個功能</strong>或<strong>一組相關修正</strong></li>
+      <li>描述<strong>使用者看到的行為</strong>，不描述程式碼實作細節</li>
+      <li>遇到 bug 時，描述<strong>問題現象 + 根本原因</strong>，讓 AI 精準修正</li>
+      <li>包含<strong>具體的格式要求</strong>（字型、符號、顏色、欄位順序）</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: tool-challenges                                         -->
+<!-- ============================================================ -->
+<div class="page" id="tool-challenges">
+  <div class="page-header header-orange">
+    <h2>挑戰 & 經驗總結</h2>
+    <p>AI 開發的真實面貌</p>
+  </div>
+
+  <h3>遇到的主要挑戰</h3>
+  <table>
+    <tr><th>挑戰</th><th>原因</th><th>解法</th></tr>
+    <tr>
+      <td>Amplify SSR 環境變數不生效</td>
+      <td>Lambda runtime 不讀 .env 檔案</td>
+      <td>Pre-build 寫入 .env.production → next.config 打包進 bundle</td>
+    </tr>
+    <tr>
+      <td>欄位名稱含換行 / 特殊空白</td>
+      <td>Google Sheets 欄位標題有 \n、NBSP</td>
+      <td>Strip 所有空白字元後再做欄位比對</td>
+    </tr>
+    <tr>
+      <td>同名欄位出現兩次</td>
+      <td>Sheet 設計：Column A 和 Column C 都叫「i預購品號」</td>
+      <td>程式碼明確取「第二次出現」的欄位索引</td>
+    </tr>
+    <tr>
+      <td>1000+ 商品表格卡頓</td>
+      <td>太多 DOM 節點導致渲染緩慢</td>
+      <td>使用 react-window 虛擬捲軸，只渲染可視區域</td>
+    </tr>
+    <tr>
+      <td>嘜頭格式精確度</td>
+      <td>Excel 合併儲存格 + 特定字型 + 符號要求</td>
+      <td>逐格設定 xlsx-js-style，3 次迭代才達到正確格式</td>
+    </tr>
+    <tr>
+      <td>日期自動填入導致錯誤</td>
+      <td>使用者反映自動填入的日期常常是錯的</td>
+      <td>移除自動填入，改為手動輸入</td>
+    </tr>
+  </table>
+
+  <hr>
+
+  <h3>迭代類型分析</h3>
+  <div class="cards cards-3">
+    <div class="card card-accent accent-orange">
+      <h4>修正類 — 40%</h4>
+      <p>欄位映射錯誤、環境變數問題、日期格式、空白字元。<strong>這類問題是 AI 無法事先預知的業務細節</strong>——只有看到真實資料才會發現。</p>
+    </div>
+    <div class="card card-accent accent-green">
+      <h4>新功能 — 35%</h4>
+      <p>訂單管理、多試算表、製造商篩選。<strong>使用者用了之後才發現需要的功能</strong>——這就是為什麼要快速出第一版。</p>
+    </div>
+    <div class="card card-accent accent-blue">
+      <h4>UI 優化 — 25%</h4>
+      <p>欄寬調整、色彩標記、展開/收合、精簡版面。<strong>讓工具從「能用」變成「好用」的最後一哩路。</strong></p>
+    </div>
+  </div>
+
+  <hr>
+
+  <h3>這個案例驗證了什麼？</h3>
+  <div class="cols cols-2">
+    <div class="card card-accent accent-green" style="padding:24px;">
+      <h4 style="font-size:1em;">Vibe Coding 的成功要素</h4>
+      <ul>
+        <li><strong>Input/Output 非常明確</strong> — Google Sheets → Excel，沒有模糊空間</li>
+        <li><strong>格式規範具體</strong> — 嘜頭字型、顏色、欄位都有精確要求</li>
+        <li><strong>漸進式開發</strong> — 先能用，使用者回饋後再改</li>
+        <li><strong>快速回饋循環</strong> — 部署後使用者立刻測試、立刻回報</li>
+      </ul>
+    </div>
+    <div class="card card-accent accent-orange" style="padding:24px;">
+      <h4 style="font-size:1em;">AI 開發的真實面貌</h4>
+      <ul>
+        <li><strong>40% 時間在修正</strong> — 業務規則 AI 猜不到，只能靠迭代</li>
+        <li><strong>環境問題仍需人工</strong> — Amplify SSR 的坑不是 AI 能預見的</li>
+        <li><strong>Excel 格式靠迭代</strong> — 看到 output 才知道對不對</li>
+        <li><strong>2 天完成 = 傳統 1-2 週的工作量</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight hl-purple" style="margin-top:24px;">
+    <p style="text-align:center; font-size:1.1em;">
+      <strong>AI 是加速器，不是替代品。好的需求定義 + AI 工具 = 10 倍效率。</strong>
+    </p>
+  </div>
+</div>
+
+</div> <!-- end .main -->
+
+<!-- ===== NAVIGATION SCRIPT ===== -->
+<script>
+  const links = document.querySelectorAll('.sidebar-link');
+  const pages = document.querySelectorAll('.page');
+
+  function navigate(pageId) {
+    pages.forEach(p => p.classList.remove('active'));
+    links.forEach(l => l.classList.remove('active'));
+
+    const target = document.getElementById(pageId);
+    const link = document.querySelector(`[data-page="${pageId}"]`);
+
+    if (target) target.classList.add('active');
+    if (link) link.classList.add('active');
+
+    // Update URL hash without scrolling
+    history.replaceState(null, '', '#' + pageId);
+
+    // Scroll main to top
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      navigate(link.dataset.page);
+    });
+  });
+
+  // Handle initial hash
+  if (window.location.hash) {
+    const id = window.location.hash.slice(1);
+    if (document.getElementById(id)) navigate(id);
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const activeLink = document.querySelector('.sidebar-link.active');
+    const allLinks = Array.from(links);
+    const idx = allLinks.indexOf(activeLink);
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (idx < allLinks.length - 1) navigate(allLinks[idx + 1].dataset.page);
+    }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (idx > 0) navigate(allLinks[idx - 1].dataset.page);
+    }
+  });
+</script>
+</body>
+</html>
