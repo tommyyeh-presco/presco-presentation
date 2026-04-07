@@ -540,6 +540,9 @@
   <a class="sidebar-link" data-page="roadmap">
     <span class="dot dot-purple"></span>待開發功能
   </a>
+  <a class="sidebar-link" data-page="live-demo">
+    <span class="dot dot-purple"></span>Live Demo
+  </a>
 
   <div class="sidebar-section">Part 2 — Vibe Coding</div>
   <a class="sidebar-link" data-page="vibe-intro">
@@ -1288,6 +1291,74 @@
     <div class="card"><h4>優惠券</h4><p>結帳時套用折扣碼</p></div>
     <div class="card"><h4>結帳</h4><p>填寫收件資訊、確認訂單</p></div>
   </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: live-demo                                               -->
+<!-- ============================================================ -->
+<div class="page" id="live-demo">
+  <div class="page-header header-purple">
+    <h2>Live Demo</h2>
+    <p>直接操作 PRESCOMART 平台</p>
+  </div>
+
+  <div class="highlight hl-purple">
+    <p>以下是目前部署的 PRESCOMART 測試環境，可以直接登入操作所有功能模組。</p>
+  </div>
+
+  <div class="cards cards-3" style="margin: 28px 0;">
+    <div class="card card-accent accent-purple" style="text-align:center; padding: 28px;">
+      <h4 style="font-size:0.8em; color:var(--gray-500); margin-bottom:12px;">平台網址</h4>
+      <p style="font-size:1.3em; margin:0;">
+        <a href="http://98.84.167.166:3000/" target="_blank" rel="noopener"
+          style="color:var(--purple); text-decoration:none; font-weight:600;">
+          http://98.84.167.166:3000/
+        </a>
+      </p>
+    </div>
+    <div class="card card-accent accent-blue" style="text-align:center; padding: 28px;">
+      <h4 style="font-size:0.8em; color:var(--gray-500); margin-bottom:12px;">帳號</h4>
+      <p style="font-size:1.3em; margin:0; font-family:'JetBrains Mono',monospace; font-weight:600;">admin@prescomart.local</p>
+    </div>
+    <div class="card card-accent accent-green" style="text-align:center; padding: 28px;">
+      <h4 style="font-size:0.8em; color:var(--gray-500); margin-bottom:12px;">密碼</h4>
+      <p style="font-size:1.3em; margin:0; font-family:'JetBrains Mono',monospace; font-weight:600;">admin123</p>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin: 32px 0;">
+    <a href="http://98.84.167.166:3000/" target="_blank" rel="noopener" style="
+      display: inline-block;
+      padding: 16px 48px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      font-family: inherit;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.3);
+    " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 24px rgba(124,58,237,0.4)'"
+       onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(124,58,237,0.3)'">
+      開啟 PRESCOMART →
+    </a>
+  </div>
+
+  <hr>
+
+  <h3>建議操作路線</h3>
+  <table>
+    <tr><th>#</th><th>模組</th><th>操作</th></tr>
+    <tr><td>1</td><td>儀表板</td><td>查看今日營收、訂單數、待處理、30日趨勢圖</td></tr>
+    <tr><td>2</td><td>商品管理</td><td>瀏覽商品清單、點進商品看 SKU / 變體 / 圖片</td></tr>
+    <tr><td>3</td><td>來源管理</td><td>查看已連線的供應商來源（1688、API、手動）</td></tr>
+    <tr><td>4</td><td>訂單管理</td><td>查看訂單列表、展開明細、看利潤計算</td></tr>
+    <tr><td>5</td><td>平台管理</td><td>查看已連線的銷售平台（博客來、IOpenmall）</td></tr>
+    <tr><td>6</td><td>上架管理</td><td>看商品如何上架到不同平台、各平台獨立定價</td></tr>
+    <tr><td>7</td><td>財務總覽</td><td>營收、成本、佣金、利潤匯總</td></tr>
+    <tr><td>8</td><td>數據分析</td><td>各維度的圖表分析</td></tr>
+  </table>
 </div>
 
 <!-- ============================================================ -->
